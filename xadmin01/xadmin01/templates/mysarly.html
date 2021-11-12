@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table border="1">
+    <tr>
+        <th>id</th>
+        <th>员工编号</th>
+        <th>应发工资</th>
+        <th> 社保</th>
+        <th>实发工资</th>
+        <th>option</th>
+    </tr>
+    {% for book in all_book %}
+    <tr>
+        <td>{{ book.id }}</td>
+        <td>{{ book.员工编号 }}</td>
+        <td>{{ book.应发工资 }}</td>
+        <td>{{ book.社保 }}</td>
+        <td>{{ book.实发工资 }}</td>
+        <td>
+            <a href="/index/update_book/{{ book.id }}">更新</a>
+            <a href="/index/delete_book/{{ book.id }}">删除</a>
+        </td>
+    </tr>
+     {% endfor %}
+    </table>
+</body>
+</html>

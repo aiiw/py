@@ -1,0 +1,181 @@
+{% extends 'xadmin/base_site01.html' %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/demo/demo.css">
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            {% for id in db %}
+                $("input[name='{{ id.name }}']").textbox({width: 120, type: 'text'})
+            {% endfor %}
+
+            $('#tt').datagrid({
+                method: 'get',
+                url: "../../love/val/",
+                pagination: true,
+                loadMsg: "aiiw正在努力加载数据，请稍后...",
+                toolbar: "#tb",
+                queryParams: {
+                    sql: 'select * from dataset',
+                    subject: 'datagrid'
+                },
+
+                singleSelect: true, //只允许选中一行
+
+                columns: [
+                    [{% for key,value in thead.items %}
+                        {
+                            field: '{{ key }}',
+                            {#如下这个地方==前后要有空格#}
+                            {% if key == 'ip' %}
+                                width: 120,
+                            {% elif key == 'inputdate' %}
+                                width: 200,
+                            {% else %}
+                                width: 150,
+                            {% endif %}
+                            title: '{{ value }}'
+                        },
+                    {% endfor %}
+
+                    ]
+                ],
+                onBeforeEdit: function (index, row) {
+                    row.editing = true;
+                    updateActions(index);
+                },
+                rownumbers: true, //添加了行号
+                title: " 数据库集信息表",
+
+                onClickRow: function (rowIndex, rowData) {
+                    //两种方式,一是自动如下
+                    $("tr[datagrid-row-index=" + rowIndex + "]").find("td").each(function () {
+                        //alert($(this).text())
+                        //alert($(this).attr('field'))
+                        tab = $(this).attr('field')
+                        //i=i+1
+                        $('#id_'+tab).textbox('setValue', $(this).text());
+
+
+                        //alert(i)
+                    })
+//$('#id_database').val(rowData.database);这个是原生态的赋值,如下是使用easyui的赋值
+                    //方便二,手动
+                    //$('#id_dataset').textbox('setValue', rowData.dataset);
+                    // $('#id_database').textbox('setValue', rowData.database);
+                    // $('#id_username').textbox('setValue', rowData.username);
+                    // $('#id_passwd').textbox('setValue', rowData.passwd);
+                    // $('#id_ip').textbox('setValue', rowData.ip);
+                    // $('#id_inputdate').textbox('setValue', rowData.inputdate);
+                    // $('#id_remark').textbox('setValue', rowData.remark);
+                },
+
+
+                {#这个地方是截止#}
+            })
+
+
+        })
+
+        function del() {
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                dataType: "text",//预期服务器返回的数据类型 如果是对象返回的是json 如果是字符串这里一定要定义text 之前我就是定义json 结果字符串的返回一直到额error中去
+                url: "../../user/deldb",//url
+                data: $('#myform1').serialize(),//这个是form表单中的id   jQuery的serialize()方法通过序列化表单值
+                success: function (result) {
+                    console.log("打印服务端返回的数据(调试用)");//打印服务端返回的数据(调试用)
+                    {#console.log(result);//打印服务端返回的数据(调试用)#}
+                    console.log(result);//打印服务端返回的数据(调试用)
+                    ;
+                    $('#tt').datagrid("reload");
+                },
+                error: function (s, s2, s3) {
+                    alert("删除失败！");
+                }
+            });
+            $('#tt').datagrid("reload");
+        }
+
+        function update1() {
+
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                dataType: "text",//预期服务器返回的数据类型 如果是对象返回的是json 如果是字符串这里一定要定义text 之前我就是定义json 结果字符串的返回一直到额error中去
+                /*
+                dataType:
+                    要求为String类型的参数，预期服务器返回的数据类型。如果不指定，JQuery将自动根据http包mime信息返回responseXML或responseText，并作为回调函数参数传递。可用的类型如下：
+                    xml：返回XML文档，可用JQuery处理。
+                    html：返回纯文本HTML信息；包含的script标签会在插入DOM时执行。
+                    script：返回纯文本JavaScript代码。不会自动缓存结果。除非设置了cache参数。注意在远程请求时（不在同一个域下），所有post请求都将转为get请求。
+                    json：返回JSON数据。
+                    jsonp：JSONP格式。使用SONP形式调用函数时，例如myurl?callback=?，JQuery将自动替换后一个“?”为正确的函数名，以执行回调函数。
+                    text：返回纯文本字符串。
+                */
+                url: "../../user/updatadb",//url
+                data: $('#myform1').serialize(),//这个是form表单中的id   jQuery的serialize()方法通过序列化表单值
+                success: function (result, status) {
+                    console.log("打印服务端返回的数据(调试用)");//打印服务端返回的数据(调试用)
+                    {#console.log(result);//打印服务端返回的数据(调试用)#}
+                    console.log(result);//打印服务端返回的数据(调试用)
+                    if (result.resultCode == 200) {//这个在这里没有用的,resultCode相当返回的结果集中的一个字体内容
+                        alert("SUCCESS");
+                    }
+                    ;
+                    $('#tt').datagrid("reload");
+                },
+                error: function (s, s2, s3) {
+                    //数据成功传到后台 也有返回值 但就是报错 parsererror ：参考
+                    https://blog.csdn.net/AinGates/article/details/75250223/
+
+                        /*
+                            写了一个ajax方法，后台一切正常，通过浏览器的F12工具查看XMLHttpRequest.status返回200，XMLHttpRequest.readyState返回4，也都没有问题。但是回调函数跳到error里，报parsererror的错误。经过排查，发现是因为后台返回时用了@ResponseBody注解（SpringMVC返回json格式的注解），但前台ajax提交没有定义dataType属性（定义服务器返回的数据类型）
+
+                            还有一种情况是ajax方法中定义了 dataType:"json"属性，就一定要返回标准格式的json字符串，要不jQuery1.4+以上版本会报错的，因为不是用eval生成对象了，用的JSON.parse，如果字符串不标准就会报错。比如只返回一个简单的字符串“success”，“fail”， true，false，并不是标准的json字符串就会报错。
+
+                                   首先，jQuery 1.4版本之后对服务端返回的JSON 数据要求比较严格，必须严格按照JSON的标准来了。
+                        */
+
+                        console.log(s)
+                    console.log(s2)
+                    console.log(s3)
+
+                    alert("修改失败！");
+                }
+            });
+
+
+        }
+
+
+    </script>
+
+
+
+    <div id="id1" class="easyui-panel" title="输入数据库信息集"
+         style="width:auto;height:90px;padding:10px;background:#fafafa;"
+         data-options="iconCls:'icon-save',closable:true,
+    collapsible:true,minimizable:true,maximizable:true">
+
+        <form METHOD="post" action="../setdb/" id="myform1">
+            {% csrf_token %}
+            {{ db }}
+
+            <input type="submit">
+            <button type="button" onclick="update1()">修改</button>
+            <button type="button" onclick="del()">删除</button>
+        </form>
+    </div>
+
+    <table id="tt" style="width:auto;height:500px">
+    </table>
+
+
+
+{% endblock %}
+

@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分页测试</title>
+</head>
+<body>
+<table border="1">
+    <tr>
+        <th>id</th>
+
+    </tr>
+{% for books in all_rs %}
+    <tr>
+        <td>
+<table border="1"  >
+ <tr style="width: 100%">
+    {% for book in books %}
+
+                <td>
+                    {{ book }}
+                </td>
+
+
+
+                {% endfor %}
+
+
+ </tr>
+
+</table>
+        </td>
+
+    </tr>
+{% endfor %}
+ </table>
+
+</body>
+</html>

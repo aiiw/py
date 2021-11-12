@@ -1,0 +1,63 @@
+{% extends 'xadmin/base_site01.html' %}
+{% block content %}
+        <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css">
+        <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css">
+        <link rel="stylesheet" type="text/css" href="../../static/easyui/demo/demo.css">
+        <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+        <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+        <script type="text/javascript">
+            $(function () {
+                $('#tt').datagrid({
+                    method:'get',
+                    url: "../../love/val/",
+                    pagination: true,
+                    loadMsg: "aiiw正在努力加载数据，请稍后...",
+                    toolbar: "#tb",
+                    queryParams: {
+		            sql: '{{ wc.sql.value }}',
+		            subject: 'datagrid'
+                    },
+
+                    columns: [
+                        [{% for b in thead %}
+                            {
+                                field: '{{ b }}',
+                                width: 80,
+                                title: '{{ b }}'
+                            },
+                            {% endfor %}
+
+                        ]
+                    ],
+                    onBeforeEdit: function (index, row) {
+                        row.editing = true;
+                        updateActions(index);
+                    },
+                    rownumbers: true, //添加了行号
+                    title: "  测试使用的数据控件",
+
+
+                })
+
+
+
+
+            })
+
+        </script>
+
+
+<body>
+<form METHOD="post" action="../test_view/">
+{% csrf_token %}
+{{ wc }}
+    <input type="submit" >
+</form>
+
+    <table id="tt" style="width:auto;height:700px">
+    </table>
+
+</body>
+{% endblock %}
+

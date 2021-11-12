@@ -1,0 +1,362 @@
+{% extends 'xadmin/base_site01.html' %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/themes/color.css">
+    <link rel="stylesheet" type="text/css" href="../../static/easyui/demo/demo.css">
+    <script type="text/javascript" src="../../static/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../../static/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        var ss = "全局变量"
+        $(document).ready(function () {
+
+            mytree()
+            ss = "局部变量"
+            $("#ztool").hide()
+            $.get("/log/", function (data, status) {
+                if (data == "1") {
+                    $(location).attr('href', 'http://www.baidu.com')
+                }
+                $('#discontent').text(data)
+            });
+
+
+            // $('#et').etree({
+            //     // url: './tree_data.json',
+            //     url: 'http://192.168.0.7:8075/sn/snippets/'
+            //     // checkbox: 'true',
+            //     onClick: function (node) {
+            //         alert(node.text); // 在用户点击的时候提示
+            //     }
+            // });
+
+
+            $('#cc').combobox({
+                url: './tree_data.json',
+                valueField: 'id',
+                textField: 'text',
+
+            })
+            $('#cc').combobox({
+
+                onChange: function () {
+
+                    fn = $('#cc').combobox('getValue')
+                    url = "./" + fn + ".text"
+                    $('#regul').text($('#cc').combobox('getValue') + "---" + url)
+                    $('#discontent').text("")
+                    $.get(url, function (data, status) {
+                        $('#discontent').text(data),
+                            $('#inputcontent').val(data)
+                    })
+                },
+            })
+            $("#inputcontent5").textbox({
+                multiline: 'true'
+
+            })
+            // if (aa!=="1")
+            // { alert(aa);
+            // 	$(location).attr('href', 'www.baidu.com');}
+            $("#btool").click(function () {
+                $("#ztool").toggle();
+                /* Act on the event */
+            })
+
+            $("#button1").click(function () {
+                $("#div1").load("./123.txt", function (responseTxt, statusTxt, xhr) {
+                    if (statusTxt == "success")
+                        alert("外部内容加载成功!");
+                    if (statusTxt == "error")
+                        alert("Error: " + xhr.status + ": " + xhr.statusText);
+                });
+            });
+            $('#elm').datagrid({
+
+                url: "./tree_data.json/",
+                pagination: true,
+                loadMsg: "aiiw正在努力加载数据，请稍后...",
+                // toolbar: "#tb",
+                showHeader: true,
+                singleSelect: true,
+                columns: [
+                    [{
+                        field: 'id',
+                        title: '序号',
+                        width: 80,
+                    },
+                        {
+                            field: 'text',
+                            title: '栏目名称',
+                            width: 80,
+                            editor: {
+                                type: 'text'
+
+                            }
+                        },
+                        {
+                            field: 'action',
+                            title: 'Action',
+                            width: 90,
+                            align: 'center',
+                            formatter: function (value, row, index) {
+                                if (row.editing) {
+                                    var s =
+                                        '<a href="javascript:void(0);" onclick="saverow(this)">Save</a> ';
+                                    var c =
+                                        '<a href="javascript:void(0);" onclick="cancelrow(this)">Cancel</a>';
+                                    return s + c;
+                                } else {
+                                    var e =
+                                        '<a href="javascript:void(0);" onclick="editrow(this)">Edit</a> ';
+                                    var d =
+                                        '<a href="javascript:void(0);" onclick="abc()">Delete</a>';
+                                    return e + d;
+                                }
+                            }
+                        }
+
+                    ]
+                ],
+                onBeforeEdit: function (index, row) {
+                    row.editing = true;
+                    updateActions(index);
+                },
+                rownumbers: true, //添加了行号
+                // title: '编辑栏目2'
+
+
+            })
+        });
+
+        function updateActions(index) {
+            $('#elm').datagrid('updateRow', {
+                index: index,
+                row: {}
+            });
+        }
+
+        function getRowIndex(target) {
+            var tr = $(target).closest('tr.datagrid-row');
+            return parseInt(tr.attr('datagrid-row-index'));
+        }
+
+        function editrow(target) {
+            $('#elm').datagrid('beginEdit', getRowIndex(target));
+        }
+
+        function deleterow(target) {
+            $.messager.confirm('Confirm', 'Are you sure?', function (r) {
+                if (r) {
+                    $('#elm').datagrid('deleteRow', getRowIndex(target));
+                }
+            });
+        }
+
+        function saverow(target) {
+            $('#elm').datagrid('endEdit', getRowIndex(target));
+        }
+
+        function cancelrow(target) {
+            $('#elm').datagrid('cancelEdit', getRowIndex(target));
+        }
+
+
+        function callme()
+        // {alert($('#inputcontent').val())
+        {
+            $.ajax({
+                // url: './123.txt',
+                // url:'/postre',
+                url: '/postre',
+                type: 'get',
+                dataType: 'text',
+                data: {
+                    mystr: $('#inputcontent').val()
+                },
+                success: function (data) {
+                    $('#discontent').empty(); //清空resText里面的所有内容
+                    var html = data;
+                    //  $.each(data, function(commentIndex, comment){
+                    //       html = comment
+                    // });
+                    $('#discontent').text(html);
+                }
+
+            })
+        }
+
+        function redirect()
+        // {window.location.href = "http://www.baidu.com"}
+        {
+            $(location).attr('href', 'http://www.baidu.com');
+        }
+
+        function callme1(id)
+        // {alert($('#inputcontent').val())
+        {   //alert($("#callme").text());
+            alert(id)
+            $.ajax({
+                // url: './123.txt',
+                // url:'/postre',
+                url: "../../user/resql",//url
+                type: 'POST',
+                dataType: 'text',
+                data: {
+                    mystr: $('#inputcontent').val(),
+                    csrfmiddlewaretoken:$("input[name='csrfmiddlewaretoken']").val(),
+                    id:id,
+                },
+                success: function (data) {
+                    $('#discontent').empty(); //清空resText里面的所有内容
+                    var html = data;
+                    //  $.each(data, function(commentIndex, comment){
+                    //       html = comment
+                    // });
+                    $('#discontent').text(html);
+                }
+
+            })
+        }
+
+
+        function clear1() {
+            $('#discontent').empty()
+            $('#inputcontent').val("")
+        }
+
+        function postregulation() {
+            // $.ajax({
+            // 	url: '/postregulation/',
+            // 	type: 'get',
+            // 	dataType: 'text',
+            // 	??data: {mystr2: 'postddd'},
+            // 	success:function(data){
+            //                     $('#regul').empty();   //清空resText里面的所有内容
+            //                         var html = data; 
+
+            //                         $('#regul').text(html);
+            // 	}
+            // })
+            $("#regul").load("./123.txt", function (responseTxt, statusTxt, xhr) {
+                if (statusTxt == "success")
+                    alert("外部内容加载成功!");
+                if (statusTxt == "error")
+                    alert("Error: " + xhr.status + ": " + xhr.statusText);
+            });
+
+
+        }
+
+        function calltext() {
+
+            $.get("../gettext/", function (data, status) {
+                $('#discontent').text(data)
+            });
+
+        }
+
+        function opendlg1() {
+            $('#dlg').dialog('open').dialog('setTitle', '栏目设置');
+
+        }
+
+        function addlm() {
+            $.ajax({
+                // url: './123.txt',
+                // url:'/postre',
+                url: '../addlm/',
+                type: 'get',
+                dataType: 'text',
+                data: $('#lm').serialize(),
+                success: function (data) {
+
+                }
+
+            })
+            $('#cc').combobox({
+                url: './tree_data.json',
+                valueField: 'id',
+                textField: 'text'
+            })
+        }
+
+        function elm() {
+            $('#delm').dialog('open').dialog('setTitle', '栏目编辑1');
+
+        }
+
+
+        function wlm() {
+            index = $('#cc').combobox('getValue')
+            $.ajax({
+                url: '../wlm/',
+                type: 'get',
+                dataType: 'text',
+                data: {
+                    'id': index,
+                    'text': $('#inputcontent').val(),
+
+                },
+                success: function (data) {
+
+                }
+            })
+
+        }
+    </script>
+    </head>
+
+    <body>
+    <div id="div1">
+        <h2>集成工具</h2>
+        {% csrf_token %}
+    </div>
+    <div style="float:left" id="test">
+        <div class="easyui-panel" title="定制数据" iconCls="icon-search" collapsible="ture"
+             style="padding:5px;width:1200px;height:500px;">
+            <div class="easyui-layout" fit="true">
+                <div region="north" border="ture" class="p-search">
+                    <label>输入:</label>
+                    <input id='input1' type='text'></input>
+                    <button onclick="alert('aaii')">提交</button>
+                    <button onclick="postregulation()">获取规则</button>
+                    <span id="regul"></span>
+                </div>
+                <div region="center" border="ture" style="background-color:yellow; ">
+                    <div class="easyui-layout" fit="true" id='zz'>
+                        <!-- <div region="east" border="ture" class="p-right">
+                    <img src="img/zxx.jpg"/>
+                </div> -->
+                        <div region="center" border="ture" style="border:1px solid #ccc;">
+                            <div class="easyui-layout" fit="true">
+                                <div region="center" border="ture" id="discontent">
+                                </div>
+                                <div region="south" split="true" border="ture" style="height:200px;">
+                                    <div id="inputcontent3"><textarea
+                                            style="border:1px;width:100%;height:150px;resize:none"
+                                            id="inputcontent"></textarea></div>
+                                    <div>
+                                        <button onclick="callme1(this.id)"  class="easyui-linkbutton" id="1">提交T100脚本</button>
+                                        <button onclick="callme1(this.id)"  class="easyui-linkbutton" id="2">提交数据加""</button>
+                                        <input type="text" class="easyui-combobox" id="cc">
+                                        <button onclick="wlm()" class="easyui-linkbutton">写入栏目</button>
+                                        <buttion onclick="elm()" class="easyui-linkbutton">编辑栏目</buttion>
+                                        </input>
+                                        <button onclick="opendlg1()" class="easyui-linkbutton">新增栏目</button>
+
+                                        <button onclick="clear1()" class="easyui-linkbutton">清除</button>
+                                        <button onclick="redirect()" class="easyui-linkbutton">重定向</button>
+                                        <button id="btool" class="easyui-linkbutton">子工具开关</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
